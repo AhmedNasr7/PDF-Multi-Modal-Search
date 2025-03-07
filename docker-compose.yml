@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  vlm_server:
+    container_name: vlm_server
+    build: .
+    command: python server.py
+    ports:
+      - "8000:8000"
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: always
+    networks:
+      - app_network
+
+  streamlit_app:
+    container_name: streamlit_ui
+    build: .
+    command: streamlit run app.py --server.port=8501 --server.address=0.0.0.0
+    ports:
+      - "8501:8501"
+    depends_on:
+      - vlm_server
+    restart: always
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
