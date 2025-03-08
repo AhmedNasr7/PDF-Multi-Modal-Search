@@ -1,10 +1,11 @@
 import argparse
 import os
+from typing import List
 from modules.document_parser import DocumentParser
 from modules.text_processor import TextProcessor
 from modules.vector_db import VectorDBHandler
 from modules.reranker import ReRanker
-from modules.t5_answer_merger import T5AnswerMerger
+from modules.answer_merger import T5AnswerMerger
 from modules.query_pipeline import QueryPipeline
 from modules.vlm_service import VLMService
 
@@ -17,7 +18,7 @@ def main():
     parser.add_argument("pdf_path", type=str, help="Path to the PDF file")
     parser.add_argument("--ranker", type=str, choices=["tfidf", "cosine_similarity", "none"], default="cosine_similarity",
                         help="Ranking method (default: cosine_similarity)")
-    parser.add_argument("--merger", type=str, choices=["t5", "concatenation"], default=None,
+    parser.add_argument("--merger", type=str, choices=["t5", "concatenation"], default="None",
                         help="Merging method (default: t5)")
     parser.add_argument("--top_k", type=int, default=2, help="Number of retrieved results (default: 5)")
 
@@ -46,9 +47,9 @@ def main():
 
     structured_data = doc_parser.parse_pdf(args.pdf_path)
     
-    # Process text and store in Qdrant
-    document_text = " ".join([item["text"] for item in structured_data["content"] if item["type"] == "text"])
-    text_chunks = text_processor.chunk_text(document_text)
+
+    text_chunks = text_processor.extract_text_items(structured_data)
+    print(f"Text chunks: {text_chunks}")
     embeddings = text_processor.embed_chunks(text_chunks)
     vector_db.store_vectors(text_chunks, embeddings)
 
@@ -62,6 +63,8 @@ def main():
             break
 
         answer = pipeline.process_query(query)
+        if isinstance(answer, List):
+            answer = answer[0]
         print("\n🔹 Answer:", answer)
 
     print("\n👋 Exiting. Thank you!")

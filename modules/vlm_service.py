@@ -26,7 +26,7 @@ class VLMService:
             response = requests.post(self.api_url, json=payload)
 
             if response.status_code == 200:
-                return response.json()
+                return response.json()["description"]
             else:
                 return f"Error: {response.status_code}, {response.text}"
 

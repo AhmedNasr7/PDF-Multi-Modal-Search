@@ -24,6 +24,8 @@ RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 # Copy project files
 COPY . /app
 
+RUN pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 

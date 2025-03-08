@@ -20,7 +20,7 @@ class VectorDBHandler:
             vectors_config=VectorParams(size=384, distance="Cosine") # cosine similarity and 
         )
 
-    def store_in_qdrant(self, chunks, embeddings):
+    def store_vectors(self, chunks, embeddings):
         """
         Stores text chunks in Qdrant with embeddings.
         :param chunks: List of text chunks.
@@ -37,7 +37,7 @@ class VectorDBHandler:
                     )
                 ]
             )
-    def search_multi_chunks(self, query_text, text_processor, top_k=5):
+    def search_vectors(self, query_text, text_processor, top_k=5):
         """
         Searches Qdrant for multiple relevant text chunks and ranks them by highest cosine similarity.
         

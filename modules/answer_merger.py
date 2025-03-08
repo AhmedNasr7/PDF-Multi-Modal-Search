@@ -1,20 +1,30 @@
-from transformers import pipeline
+from transformers import T5ForConditionalGeneration, T5Tokenizer
 
-# Optional: I might use T5 To generate coherent answer from multiple retrieved answers. 
+
+# Optional: I might use T5 To generate summarized coherent answers from multiple retrieved answers. 
 
 class T5AnswerMerger:
     """
     Uses T5 to generate a concise and structured answer from multiple retrieved text snippets.
     """
 
-    def __init__(self, model_name="t5-large"):
+    def __init__(self, model_name="google/flan-t5-large" ):
         """
         Initializes the T5 transformer model.
-        :param model_name: Pre-trained T5 model (e.g., "t5-base", "t5-large").
+        :param model_name: Pre-trained model
         """
-        self.summarizer = pipeline("summarization", model=model_name, tokenizer=model_name)
+        # model_name = "google/flan-t5-large" 
+        self.tokenizer = T5Tokenizer.from_pretrained(model_name)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_name)
 
-    def merge_and_summarize(self, chunks, max_length=250, min_length=50):
+
+    def generate_text(self, prompt, max_length=500):
+        input_ids = self.tokenizer(prompt, return_tensors="pt").input_ids
+        output = self.model.generate(input_ids, max_length=max_length, num_return_sequences=1)
+        return self.tokenizer.decode(output[0], skip_special_tokens=True)
+
+
+    def merge_and_summarize(self, chunks, max_length=2000, min_length=10):
         """
         Merges multiple retrieved text chunks and summarizes them using T5.
         :param chunks: List of text snippets.
@@ -25,10 +35,8 @@ class T5AnswerMerger:
         merged_text = " ".join(chunks)  # Merge all retrieved chunks into a single text block
 
         # Prepend summarization task (T5 requires a task-specific prefix)
-        input_text = "summarize: " + merged_text  
+        input_text = "Summarize this text: " + merged_text  
 
-        summarized_text = self.summarizer(
-            input_text, max_length=max_length, min_length=min_length, do_sample=False
-        )
-
-        return summarized_text[0]['summary_text']
+        outputs = self.generate_text(input_text)
+        
+        return outputs

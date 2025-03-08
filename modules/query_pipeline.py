@@ -35,8 +35,11 @@ class QueryPipeline:
         :param query: The user's query.
         :return: A structured response.
         """
-        query_embedding = self.text_processor.embed_chunks([query])[0]
-        retrieved_chunks = self.vector_db.search_vectors(query_embedding, top_k=self.top_k)
+        # query_text_chunks = self.text_processor.chunk_text(query)
+        print("query: ", query, self.top_k)
+        # query_embedding = self.text_processor.model.encode(query)
+        # query_embedding = self.text_processor.embed_chunks([query])[0]
+        retrieved_chunks = self.vector_db.search_vectors(query, self.text_processor, top_k=self.top_k)
 
         # Apply ranking if a method is set
         if self.ranker_method == "tfidf" and self.reranker:
@@ -47,7 +50,8 @@ class QueryPipeline:
             ranked_chunks = retrieved_chunks  # No ranking applied
 
         if self.merger_method == "t5" and self.t5_merger:
-            return self.t5_merger.merge_answers(ranked_chunks, query)
+            print(ranked_chunks)
+            return self.t5_merger.merge_and_summarize(ranked_chunks, query)
         elif self.merger_method == "concatenation":
             return "\n".join(ranked_chunks)  # Simple concatenation of retrieved chunks
         else:
