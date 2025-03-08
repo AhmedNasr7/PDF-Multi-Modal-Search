@@ -71,6 +71,10 @@ streamlit run app.py --server.port=8501
 ```
 The Streamlit UI will be available at `http://localhost:8501`.
 
+Or Alternatively, use the CLI 
+```bash
+python main.py path/to/document.pdf 
+```
 ---
 
 ## **📌 Usage Guide**
