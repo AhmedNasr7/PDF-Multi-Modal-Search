@@ -61,7 +61,7 @@ pip install -r requirements.txt
 
 #### **3️⃣ Run the VLM Server**
 ```bash
-python server.py
+python server/vlm_server.py 
 ```
 This starts the **Qwen2.5-VL Vision-Language Model API** at `http://localhost:8000/caption_image`.
 
