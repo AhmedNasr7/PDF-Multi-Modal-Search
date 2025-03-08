@@ -18,7 +18,7 @@ def main():
     parser.add_argument("pdf_path", type=str, help="Path to the PDF file")
     parser.add_argument("--ranker", type=str, choices=["tfidf", "cosine_similarity", "none"], default="cosine_similarity",
                         help="Ranking method (default: cosine_similarity)")
-    parser.add_argument("--merger", type=str, choices=["t5", "concatenation"], default="None",
+    parser.add_argument("--merger", type=str, choices=["t5", "concatenation"], default=None,
                         help="Merging method (default: t5)")
     parser.add_argument("--top_k", type=int, default=2, help="Number of retrieved results (default: 5)")
 
@@ -63,7 +63,7 @@ def main():
             break
 
         answer = pipeline.process_query(query)
-        if isinstance(answer, List):
+        if isinstance(answer, List) and answer:
             answer = answer[0]
         print("\n🔹 Answer:", answer)
 
